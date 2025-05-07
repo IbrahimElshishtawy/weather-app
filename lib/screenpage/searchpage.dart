@@ -7,16 +7,7 @@ class Searchpage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // Action for settings button
-              Navigator.pop(context);
-            },
-          ),
-        ],
+        iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: const Color.fromARGB(255, 216, 144, 26),
         title: const Text('Search Page'),
         centerTitle: true,
@@ -24,21 +15,25 @@ class Searchpage extends StatelessWidget {
       body: Center(
         child: TextField(
           decoration: InputDecoration(
+            label: Text('search'),
+            contentPadding: EdgeInsets.symmetric(
+              vertical: 25.0,
+              horizontal: 20,
+            ),
+            filled: false,
+
+            fillColor: Colors.white,
             hintText: 'Enter city name',
-            prefixIcon: const Icon(Icons.search),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15.0),
+              borderRadius: BorderRadius.circular(10.0),
               borderSide: const BorderSide(color: Colors.blue, width: 2.0),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
               borderSide: const BorderSide(color: Colors.blue, width: 2.0),
             ),
+            suffixIcon: Icon(Icons.search),
           ),
-          onSubmitted: (String value) {
-            // Handle search action here
-            print('Searching for $value');
-          },
         ),
       ),
     );

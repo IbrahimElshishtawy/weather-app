@@ -9,7 +9,7 @@ class Homepage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
-
+        iconTheme: IconThemeData(color: Colors.white),
         title: const Text('Weather App'),
         centerTitle: true,
         actions: [
