@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-
+import 'package:weather/service/weather_service.dart';
 class Searchpage extends StatelessWidget {
   const Searchpage({super.key});
+
+  static String? cityName;
 
   @override
   Widget build(BuildContext context) {
@@ -13,14 +15,24 @@ class Searchpage extends StatelessWidget {
         centerTitle: true,
       ),
       body: Center(
-        child: TextField(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18.0),
+          child: TextField(
+           
+          onSubmitted: (data)
+          {
+            cityName = data;
+            WeatherService service = WeatherService(); 
+            service.getWeather(cityName: cityName!, apiKey: )
+
+          },
           decoration: InputDecoration(
             label: Text('search'),
             contentPadding: EdgeInsets.symmetric(
               vertical: 25.0,
               horizontal: 20,
             ),
-            filled: false,
+            filled: false, 
 
             fillColor: Colors.white,
             hintText: 'Enter city name',
@@ -36,6 +48,8 @@ class Searchpage extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ), 
+      );
   }
 }
+
