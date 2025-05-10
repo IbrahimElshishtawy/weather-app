@@ -1,55 +1,70 @@
 import 'package:flutter/material.dart';
-import 'package:weather/service/weather_service.dart';
-class Searchpage extends StatelessWidget {
-  const Searchpage({super.key});
 
-  static String? cityName;
+class Searchpage extends StatelessWidget {
+  final Map<String, dynamic> weatherData;
+
+  const Searchpage({super.key, required this.weatherData});
 
   @override
   Widget build(BuildContext context) {
+    var weatherData2 = weatherData;
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
+        title: Text('${weatherData['city']} - Weather Details'),
         backgroundColor: const Color.fromARGB(255, 216, 144, 26),
-        title: const Text('Search Page'),
-        centerTitle: true,
+        foregroundColor: Colors.white,
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18.0),
-          child: TextField(
-           
-          onSubmitted: (data)
-          {
-            cityName = data;
-            WeatherService service = WeatherService(); 
-            service.getWeather(cityName: cityName!, apiKey: )
-
-          },
-          decoration: InputDecoration(
-            label: Text('search'),
-            contentPadding: EdgeInsets.symmetric(
-              vertical: 25.0,
-              horizontal: 20,
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Card(
+          elevation: 6,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.network(
+                  'https:${weatherData['icon']}',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(Icons.error);
+                  },
+                  width: 60,
+                  height: 60,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  '${weatherData['condition']}',
+                  style: const TextStyle(fontSize: 24),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Temperature: ${weatherData['temp_c']}°C',
+                  style: const TextStyle(fontSize: 20),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Humidity: ${weatherData['humidity']}%',
+                  style: const TextStyle(fontSize: 20),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Wind: ${weatherData['wind_kph']} km/h',
+                  style: const TextStyle(fontSize: 20),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Last Updated: ${weatherData['last_updated']}',
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ],
             ),
-            filled: false, 
-
-            fillColor: Colors.white,
-            hintText: 'Enter city name',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-            ),
-            suffixIcon: Icon(Icons.search),
           ),
         ),
       ),
-    ), 
-      );
+    );
   }
 }
-
