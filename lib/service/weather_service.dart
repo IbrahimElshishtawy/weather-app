@@ -7,26 +7,8 @@ class WeatherService {
 
   Future<void> getWeather({required String cityName}) async {
     Uri url = Uri.parse('$baseUrl/current.json?key=$apiKey&q=$cityName&aqi=no');
+    http.Response response = await http.get(url);
 
-    try {
-      http.Response response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        dynamic data = jsonDecode(response.body);
-
-        Map<String, dynamic> weatherData = {
-          'location': data['location'],
-          'current': data['current'],
-          // مفيش forecast هنا لأنك بتستخدم current.json
-        };
-
-        print(weatherData);
-      } else {
-        print('Error: ${response.statusCode}');
-        print('Body: ${response.body}');
-      }
-    } catch (e) {
-      print('Exception: $e');
-    }
+    Map<String, dynamic> data = jsonDecode(response.body);
   }
 }
