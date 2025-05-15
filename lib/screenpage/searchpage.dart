@@ -21,7 +21,6 @@ class Searchpage extends StatelessWidget {
             onSubmitted: (data) {
               print(data);
             },
-
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(
                 vertical: 20,

@@ -10,5 +10,6 @@ class WeatherService {
     http.Response response = await http.get(url);
 
     Map<String, dynamic> data = jsonDecode(response.body);
+    
   }
 }
