@@ -40,7 +40,10 @@ class _HomepageState extends State<Homepage> {
     switch (weatherStatus.toLowerCase()) {
       case 'sunny':
       case 'clear':
-        return [const Color.fromARGB(255, 225, 139, 8), Colors.yellow.shade100];
+        return [
+          const Color.fromARGB(255, 225, 139, 8),
+          Colors.yellow.shade100
+        ];
       case 'cloudy':
         return [Colors.grey.shade400, Colors.blueGrey.shade100];
       case 'rain':
@@ -56,20 +59,44 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
+  String getLocalWeatherIcon(String weatherStatus) {
+    switch (weatherStatus.toLowerCase()) {
+      case 'sunny':
+      case 'clear':
+        return 'assets/images/clear.png';
+      case 'cloudy':
+        return 'assets/images/cloudy.png';
+      case 'rain':
+      case 'rainy':
+      case 'shower rain':
+        return 'assets/images/rainy.png';
+      case 'snow':
+        return 'assets/images/snow.png';
+      case 'thunderstorm':
+        return 'assets/images/thunderstorm.png';
+      default:
+        return 'assets/images/clear.png';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final weatherStatus = _weather?.weatherstatus ?? '';
     final hasWeather = weatherStatus.isNotEmpty;
 
-    final bgColors =
-        hasWeather
-            ? _getWeatherColors(weatherStatus)
-            : [Colors.white, Colors.white];
+    final bgColors = hasWeather
+        ? _getWeatherColors(weatherStatus)
+        : [Colors.white, Colors.white];
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.orange,
-        title: const Text('Weather App', style: TextStyle(color: Colors.white)),
+        backgroundColor: hasWeather
+            ? _getWeatherColors(weatherStatus)[0]
+            : Colors.orange,
+        title: const Text(
+          'Weather App',
+          style: TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -116,103 +143,91 @@ class _HomepageState extends State<Homepage> {
                 child: Center(
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
-                    child:
-                        !hasWeather
-                            ? const Text(
-                              'Welcome to the Weather App!',
-                              style: TextStyle(
-                                fontSize: 26,
-                                color: Colors.grey,
-                              ),
-                              textAlign: TextAlign.center,
-                            )
-                            : Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                    child: !hasWeather
+                        ? const Text(
+                      'Welcome to the Weather App!',
+                      style: TextStyle(
+                        fontSize: 26,
+                        color: Colors.grey,
+                      ),
+                      textAlign: TextAlign.center,
+                    )
+                        : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // أيقونة الطقس فوق اسم المدينة
+                        Image.asset(
+                          getLocalWeatherIcon(_weather!.weatherstatus),
+                          width: 130,
+                          height: 130,
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          _weather!.city,
+                          style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          _weather!.weatherstatus,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            color: Colors.white70,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Card(
+                          elevation: 8,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          color: Colors.white.withOpacity(0.9),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceAround,
                               children: [
-                                // أيقونة الطقس فوق اسم المدينة
-                                Image.network(
-                                  'https://openweathermap.org/img/wn/${_weather!.icon}@2x.png',
-                                  width: 130,
-                                  height: 130,
-                                  errorBuilder:
-                                      (context, error, stackTrace) =>
-                                          const Icon(
-                                            Icons.image_not_supported,
-                                            size: 80,
-                                            color: Colors.white70,
-                                          ),
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  _weather!.city,
-                                  style: const TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  _weather!.weatherstatus,
-                                  style: const TextStyle(
-                                    fontSize: 22,
-                                    color: Colors.white70,
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                Card(
-                                  elevation: 8,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  color: Colors.white.withOpacity(0.9),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Temp: ${_weather!.tempC}°C',
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                              ),
-                                            ),
-                                            Text(
-                                              'Min: ${_weather!.minTempC}°C',
-                                            ),
-                                            Text(
-                                              'Max: ${_weather!.maxTempC}°C',
-                                            ),
-                                          ],
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const Text(
-                                              'Details:',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            Text('Date: ${_weather!.date}'),
-                                            Text(
-                                              'Status: ${_weather!.weatherstatus}',
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Temp: ${_weather!.tempC}°C',
+                                      style:
+                                      const TextStyle(fontSize: 18),
                                     ),
-                                  ),
+                                    Text(
+                                        'Min: ${_weather!.minTempC}°C'),
+                                    Text(
+                                        'Max: ${_weather!.maxTempC}°C'),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Details:',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text('Date: ${_weather!.date}'),
+                                    Text(
+                                        'Status: ${_weather!.weatherstatus}'),
+                                  ],
                                 ),
                               ],
                             ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
