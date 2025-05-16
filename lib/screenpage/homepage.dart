@@ -1,5 +1,6 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:weather/model/weathermodel.dart';
 import 'package:weather/screenpage/searchpage.dart';
 
@@ -24,7 +25,7 @@ class _HomepageState extends State<Homepage> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const Searchpage(weatherData: {}),
+        builder: (context) => Searchpage(weatherData: _weather),
       ),
     );
 
@@ -39,7 +40,7 @@ class _HomepageState extends State<Homepage> {
     switch (weatherStatus.toLowerCase()) {
       case 'sunny':
       case 'clear':
-        return [Colors.orange.shade300, Colors.yellow.shade100];
+        return [const Color.fromARGB(255, 225, 139, 8), Colors.yellow.shade100];
       case 'cloudy':
         return [Colors.grey.shade400, Colors.blueGrey.shade100];
       case 'rain':
@@ -55,33 +56,14 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
-  // ✅ تعديل: استخدام روابط الإنترنت بدل المسارات المحلية
-  String _getLottieAnimation(String weatherStatus) {
-    switch (weatherStatus.toLowerCase()) {
-      case 'sunny':
-      case 'clear':
-        return 'https://lottie.host/1c3d5074-0fe6-48b9-bab4-9504507d0307/wA5Kme3WgP.json';
-      case 'cloudy':
-        return 'https://lottie.host/87e3e93d-7a92-4e9e-a688-72cfca3eb492/cF96QJ9Dqp.json';
-      case 'rain':
-      case 'rainy':
-      case 'shower rain':
-        return 'https://lottie.host/0e85fc2b-d1ad-41b4-bfdf-7be74e5d7a38/tqLmn4ZJMj.json';
-      case 'snow':
-        return 'https://lottie.host/0f17e058-0b16-48ec-a50f-0a1d5e8d3ed5/xX3LfV5v4H.json';
-      case 'thunderstorm':
-        return 'https://lottie.host/35c1c8b5-39fd-44e3-858b-8bb79084f6ed/oI3NEKue9d.json';
-      default:
-        return 'https://lottie.host/67de258f-8d50-45d2-b2ff-8ff9794f36e2/V4VJELbAAg.json';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final hasWeather = _weather != null;
+    final weatherStatus = _weather?.weatherstatus ?? '';
+    final hasWeather = weatherStatus.isNotEmpty;
+
     final bgColors =
         hasWeather
-            ? _getWeatherColors(_weather!.weatherstatus)
+            ? _getWeatherColors(weatherStatus)
             : [Colors.white, Colors.white];
 
     return Scaffold(
@@ -91,178 +73,163 @@ class _HomepageState extends State<Homepage> {
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Stack(
-        children: [
-          // ✅ تعديل: استخدام Lottie.network بدل Lottie.asset
-          if (hasWeather)
-            Positioned.fill(
-              child: Lottie.network(
-                _getLottieAnimation(_weather!.weatherstatus),
-                fit: BoxFit.cover,
-                repeat: true,
-                errorBuilder:
-                    (context, error, stackTrace) => const Center(
-                      child: Icon(
-                        Icons.wifi_off,
-                        size: 80,
-                        color: Colors.white,
-                      ),
-                    ),
-              ),
-            )
-          else
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: bgColors,
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-            ),
-
-          Container(
-            // ignore: deprecated_member_use
-            color: hasWeather ? Colors.black.withOpacity(0.4) : Colors.white,
-            child: Column(
-              children: [
-                const SizedBox(height: 50),
-                GestureDetector(
-                  onTap: _navigateToSearch,
-                  child: Column(
-                    children: const [
-                      Icon(Icons.search, size: 50, color: Colors.orange),
-                      SizedBox(height: 5),
-                      Text(
-                        'البحث',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.orange,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-                Expanded(
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child:
-                          !hasWeather
-                              ? const Text(
-                                'Welcome to the Weather App!',
-                                style: TextStyle(
-                                  fontSize: 26,
-                                  color: Colors.grey,
-                                ),
-                                textAlign: TextAlign.center,
-                              )
-                              : Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    _weather!.city,
-                                    style: const TextStyle(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    _weather!.weatherstatus,
-                                    style: const TextStyle(
-                                      fontSize: 22,
-                                      color: Colors.white70,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  Image.network(
-                                    'https://openweathermap.org/img/wn/${_weather!.icon}@2x.png',
-                                    width: 120,
-                                    height: 120,
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            const Icon(
-                                              Icons.image_not_supported,
-                                              size: 80,
-                                            ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  Card(
-                                    elevation: 8,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    // ignore: deprecated_member_use
-                                    color: Colors.white.withOpacity(0.9),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Temp: ${_weather!.tempC}°C',
-                                                style: const TextStyle(
-                                                  fontSize: 18,
-                                                ),
-                                              ),
-                                              Text(
-                                                'Min: ${_weather!.minTempC}°C',
-                                              ),
-                                              Text(
-                                                'Max: ${_weather!.maxTempC}°C',
-                                              ),
-                                            ],
-                                          ),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              const Text(
-                                                'Details:',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                              Text('Date: ${_weather!.date}'),
-                                              Text(
-                                                'Status: ${_weather!.weatherstatus}',
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                    ),
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 12),
-                  child: Text(
-                    'By Ibrahim El shishtawy',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: bgColors,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
-        ],
+        ),
+        child: Container(
+          color: hasWeather ? Colors.black.withOpacity(0.4) : Colors.white,
+          child: Column(
+            children: [
+              const SizedBox(height: 50),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _navigateToSearch,
+                  style: ElevatedButton.styleFrom(
+                    shape: const CircleBorder(),
+                    backgroundColor: Colors.orange,
+                    padding: const EdgeInsets.all(20),
+                    elevation: 8,
+                  ),
+                  child: const Icon(
+                    Icons.search,
+                    size: 36,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Search for a city',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.orange,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 30),
+              Expanded(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child:
+                        !hasWeather
+                            ? const Text(
+                              'Welcome to the Weather App!',
+                              style: TextStyle(
+                                fontSize: 26,
+                                color: Colors.grey,
+                              ),
+                              textAlign: TextAlign.center,
+                            )
+                            : Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // أيقونة الطقس فوق اسم المدينة
+                                Image.network(
+                                  'https://openweathermap.org/img/wn/${_weather!.icon}@2x.png',
+                                  width: 130,
+                                  height: 130,
+                                  errorBuilder:
+                                      (context, error, stackTrace) =>
+                                          const Icon(
+                                            Icons.image_not_supported,
+                                            size: 80,
+                                            color: Colors.white70,
+                                          ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  _weather!.city,
+                                  style: const TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  _weather!.weatherstatus,
+                                  style: const TextStyle(
+                                    fontSize: 22,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                Card(
+                                  elevation: 8,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  color: Colors.white.withOpacity(0.9),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Temp: ${_weather!.tempC}°C',
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Min: ${_weather!.minTempC}°C',
+                                            ),
+                                            Text(
+                                              'Max: ${_weather!.maxTempC}°C',
+                                            ),
+                                          ],
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'Details:',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            Text('Date: ${_weather!.date}'),
+                                            Text(
+                                              'Status: ${_weather!.weatherstatus}',
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 12),
+                child: Text(
+                  'By Ibrahim El shishtawy',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 16,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

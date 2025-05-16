@@ -1,10 +1,12 @@
+// ignore_for_file: unused_field
+
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:weather/service/weather_service.dart';
 import 'package:weather/model/weathermodel.dart';
 
 class Searchpage extends StatefulWidget {
-  final Map<String, dynamic> weatherData;
+  final Weathermodel? weatherData;
 
   const Searchpage({super.key, required this.weatherData});
 
@@ -18,13 +20,30 @@ class _SearchpageState extends State<Searchpage> {
   final TextEditingController _controller = TextEditingController();
 
   Weathermodel? get _currentWeather {
-    try {
-      if (widget.weatherData.isEmpty) return null;
-      return Weathermodel.fromMap(widget.weatherData);
-    } catch (_) {
-      return null;
-    }
+    return widget.weatherData;
   }
+
+  final List<String> _egyptCities = [
+    'Cairo',
+    'Alexandria',
+    'Giza',
+    'Shubra El Kheima',
+    'Port Said',
+    'Suez',
+    'Luxor',
+    'Mansoura',
+    'Tanta',
+    'Asyut',
+    'Ismailia',
+    'Faiyum',
+    'Zagazig',
+    'Damietta',
+    'Damanhur',
+    'Qena',
+    'Aswan',
+    'Minya',
+    'Beni Suef',
+  ];
 
   Future<void> _searchWeather(String cityName) async {
     setState(() {
@@ -35,24 +54,31 @@ class _SearchpageState extends State<Searchpage> {
     try {
       WeatherService service = WeatherService();
       Weathermodel newWeather = await service.getWeather(cityName: cityName);
-      // ignore: use_build_context_synchronously
-      Navigator.pop(context, newWeather);
+      if (mounted) {
+        Navigator.pop(context, newWeather);
+      }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Failed to load weather data. Please try again.';
+        _errorMessage = 'فشل في تحميل بيانات الطقس. حاول مرة أخرى.';
       });
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
-  List<Color> _getWeatherColors(String weatherStatus) {
+  List<Color> _getWeatherColors(String? weatherStatus) {
+    if (weatherStatus == null) {
+      return [Colors.white, Colors.white];
+    }
+
     switch (weatherStatus.toLowerCase()) {
       case 'sunny':
       case 'clear':
-        return [Colors.orange.shade300, Colors.yellow.shade100];
+        return [const Color.fromARGB(255, 247, 150, 5), Colors.yellow.shade100];
       case 'cloudy':
         return [Colors.grey.shade400, Colors.blueGrey.shade100];
       case 'rain':
@@ -68,8 +94,11 @@ class _SearchpageState extends State<Searchpage> {
     }
   }
 
-  // ✅ روابط Lottie من الإنترنت بدل assets
-  String _getLottieAnimation(String weatherStatus) {
+  String _getLottieAnimation(String? weatherStatus) {
+    if (weatherStatus == null) {
+      return 'https://lottie.host/67de258f-8d50-45d2-b2ff-8ff9794f36e2/V4VJELbAAg.json';
+    }
+
     switch (weatherStatus.toLowerCase()) {
       case 'sunny':
       case 'clear':
@@ -91,11 +120,9 @@ class _SearchpageState extends State<Searchpage> {
 
   @override
   Widget build(BuildContext context) {
-    final hasWeather = _currentWeather != null;
-    final bgColors =
-        hasWeather
-            ? _getWeatherColors(_currentWeather!.weatherstatus)
-            : [Colors.white, Colors.white];
+    final weatherStatus = _currentWeather?.weatherstatus;
+    final hasWeather = weatherStatus != null && weatherStatus.isNotEmpty;
+    final bgColors = _getWeatherColors(weatherStatus);
 
     return Scaffold(
       appBar: AppBar(
@@ -108,7 +135,7 @@ class _SearchpageState extends State<Searchpage> {
           if (hasWeather)
             Positioned.fill(
               child: Lottie.network(
-                _getLottieAnimation(_currentWeather!.weatherstatus),
+                _getLottieAnimation(weatherStatus),
                 fit: BoxFit.cover,
                 repeat: true,
               ),
@@ -123,30 +150,53 @@ class _SearchpageState extends State<Searchpage> {
                 ),
               ),
             ),
-
           Container(
             // ignore: deprecated_member_use
             color: hasWeather ? Colors.black.withOpacity(0.4) : Colors.white,
             padding: const EdgeInsets.all(20.0),
             child: Column(
               children: [
-                TextField(
-                  controller: _controller,
-                  onSubmitted: (data) async {
-                    if (data.trim().isNotEmpty) {
-                      await _searchWeather(data.trim());
+                Autocomplete<String>(
+                  optionsBuilder: (TextEditingValue value) {
+                    if (value.text.isEmpty) {
+                      return const Iterable<String>.empty();
                     }
+                    return _egyptCities.where(
+                      (city) => city.toLowerCase().startsWith(
+                        value.text.toLowerCase(),
+                      ),
+                    );
                   },
-                  decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 20,
-                      horizontal: 20,
-                    ),
-                    label: Text('Search'),
-                    suffixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(),
-                    hintText: 'Search for a city',
-                  ),
+                  onSelected: (String selection) async {
+                    _controller.text = selection;
+                    await _searchWeather(selection);
+                  },
+                  fieldViewBuilder: (
+                    context,
+                    controller,
+                    focusNode,
+                    onFieldSubmitted,
+                  ) {
+                    return TextField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      onSubmitted: (value) async {
+                        if (value.trim().isNotEmpty) {
+                          await _searchWeather(value.trim());
+                        }
+                      },
+                      decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: 20,
+                          horizontal: 20,
+                        ),
+                        label: Text('Search'),
+                        suffixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(),
+                        hintText: 'Search for a city in Egypt',
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 30),
                 if (_isLoading)
@@ -158,10 +208,9 @@ class _SearchpageState extends State<Searchpage> {
                       style: const TextStyle(color: Colors.red, fontSize: 16),
                     ),
                   ),
-
                 const Spacer(),
                 const Text(
-                  'By Ibrahim El shishtawy',
+                  'By Ibrahim El Shishtawy',
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 16,
