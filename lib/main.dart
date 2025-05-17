@@ -89,8 +89,12 @@ class _SplashScreenState extends State<SplashScreen> {
           fit: BoxFit.cover,
         ),
       ),
+
     ),
+
     ),
+
     );
+
   }
 }

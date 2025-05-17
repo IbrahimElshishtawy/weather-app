@@ -19,9 +19,9 @@ class WeatherService {
         date: data['location']['localtime'],
         country: data['location']['country'],
         city: data['location']['name'],
-        weatherstatus: data['current']['condition']['text'],
+        weatherStatus: data['current']['condition']['text'],
         tempC: data['current']['temp_c'].toString(),
-        minTempC: 'N/A', // غير متوفر في current.json
+        minTempC:data['current']['temp_c'], // غير متوفر في current.json
         maxTempC: 'N/A', // غير متوفر في current.json
         icon: data['current']['condition']['icon'],
       );

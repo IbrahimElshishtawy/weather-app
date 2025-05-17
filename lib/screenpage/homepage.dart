@@ -81,7 +81,7 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    final weatherStatus = _weather?.weatherstatus ?? '';
+    final weatherStatus = _weather?.weatherStatus ?? '';
     final hasWeather = weatherStatus.isNotEmpty;
 
     final bgColors = hasWeather
@@ -122,19 +122,27 @@ class _HomepageState extends State<Homepage> {
                     padding: const EdgeInsets.all(20),
                     elevation: 8,
                   ),
-                  child: const Icon(
-                    Icons.search,
-                    size: 36,
-                    color: Colors.white,
+                  child: CircleAvatar(
+                    backgroundColor: hasWeather
+                        ? _getWeatherColors(weatherStatus)[0]
+                        : Colors.orange,
+                    radius: 24, // ممكن تغير الحجم
+                    child: Icon(
+                      Icons.search,
+                      size: 36,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
+              Text(
                 'Search for a city',
                 style: TextStyle(
                   fontSize: 20,
-                  color: Colors.orange,
+                  backgroundColor: hasWeather
+                      ? _getWeatherColors(weatherStatus)[0]
+                      : Colors.orange,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -145,7 +153,7 @@ class _HomepageState extends State<Homepage> {
                     padding: const EdgeInsets.all(20.0),
                     child: !hasWeather
                         ? const Text(
-                      'Welcome to the Weather App!',
+                      'Welcome to the Weather App',
                       style: TextStyle(
                         fontSize: 26,
                         color: Colors.grey,
@@ -157,7 +165,7 @@ class _HomepageState extends State<Homepage> {
                       children: [
                         // أيقونة الطقس فوق اسم المدينة
                         Image.asset(
-                          getLocalWeatherIcon(_weather!.weatherstatus),
+                          getLocalWeatherIcon(_weather!.weatherStatus),
                           width: 130,
                           height: 130,
                         ),
@@ -172,7 +180,7 @@ class _HomepageState extends State<Homepage> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          _weather!.weatherstatus,
+                          _weather!.weatherStatus,
                           style: const TextStyle(
                             fontSize: 22,
                             color: Colors.white70,
@@ -219,7 +227,7 @@ class _HomepageState extends State<Homepage> {
                                     ),
                                     Text('Date: ${_weather!.date}'),
                                     Text(
-                                        'Status: ${_weather!.weatherstatus}'),
+                                        'Status: ${_weather!.weatherStatus}'),
                                   ],
                                 ),
                               ],
